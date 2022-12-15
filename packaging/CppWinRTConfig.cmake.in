@@ -1,0 +1,21 @@
+# SPDX-FileCopyrightText: 2022 Alvin Wong
+#
+# SPDX-License-Identifier: MIT
+
+@PACKAGE_INIT@
+
+set(CppWinRT_VERSION @PROJECT_VERSION@)
+set_and_check(CppWinRT_TOOL_PATH "@PACKAGE_BIN_INSTALL_DIR@/cppwinrt@CMAKE_EXECUTABLE_SUFFIX@")
+set_and_check(CppWinRT_METADATA_PATH "@PACKAGE_WINMD_INSTALL_DIR@/Windows.winmd")
+set_and_check(CppWinRT_INCLUDE_DIR "@PACKAGE_INCLUDE_INSTALL_DIR@")
+include("${CMAKE_CURRENT_LIST_DIR}/CppWinRTTargets.cmake")
+
+# Check for the most basic headers:
+if(NOT EXISTS "${CppWinRT_INCLUDE_DIR}/winrt/Windows.Foundation.h")
+    message(FATAL_ERROR "CppWinRT header \"${CppWinRT_INCLUDE_DIR}/winrt/Windows.Foundation.h\" does not exist!")
+endif()
+if(NOT EXISTS "${CppWinRT_INCLUDE_DIR}/winrt/base.h")
+    message(FATAL_ERROR "CppWinRT header \"${CppWinRT_INCLUDE_DIR}/winrt/base.h\" does not exist!")
+endif()
+
+check_required_components(CppWinRT)
