@@ -74,6 +74,7 @@ set(BIN_INSTALL_DIR "${CMAKE_INSTALL_BINDIR}")
 set(INCLUDE_INSTALL_DIR "${CMAKE_INSTALL_INCLUDEDIR}/cppwinrt")
 set(WINMD_INSTALL_DIR "${CMAKE_INSTALL_DATAROOTDIR}/cppwinrt/metadata")
 set(CMAKECONFIG_INSTALL_DIR "${CMAKE_INSTALL_DATAROOTDIR}/cppwinrt/cmake")
+set(LICENSE_INSTALL_DIR "${CMAKE_INSTALL_DATAROOTDIR}/licenses/cppwinrt")
 
 add_library(CppWinRT_Lib INTERFACE)
 add_dependencies(CppWinRT_Lib build-cppwinrt-headers)
@@ -125,4 +126,24 @@ install(
         ${PROJECT_BINARY_DIR}/CppWinRTConfig.cmake
         ${PROJECT_BINARY_DIR}/CppWinRTConfigVersion.cmake
     DESTINATION ${CMAKECONFIG_INSTALL_DIR}
+)
+
+# License files:
+install(
+    FILES ${PROJECT_SOURCE_DIR}/cppwinrt/LICENSE
+    DESTINATION ${LICENSE_INSTALL_DIR}/cppwinrt
+)
+install(
+    FILES ${PROJECT_SOURCE_DIR}/cppwinrt/winmd/LICENSE
+    DESTINATION ${LICENSE_INSTALL_DIR}/winmd
+)
+install(
+    FILES
+        ${PROJECT_SOURCE_DIR}/metadata/license-apache-2.0
+        ${PROJECT_SOURCE_DIR}/metadata/license-mit
+    DESTINATION ${LICENSE_INSTALL_DIR}/metadata
+)
+install(
+    FILES ${PROJECT_SOURCE_DIR}/../LICENSE
+    DESTINATION ${LICENSE_INSTALL_DIR}/
 )
