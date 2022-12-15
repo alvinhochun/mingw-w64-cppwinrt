@@ -36,18 +36,16 @@ Compilers:
 * LLVM/Clang:
     * ✅ LLVM 15 is recommended.
     * 🔲 Earlier versions are untested.
-* GCC[^2]:
+* GCC:
     * ✅ GCC 12 in MSYS2 has been tested to work.
     * 🔲 GCC 11 is untested.
-    * 🔲 GCC 10 is untested, and will require adding the `-fcoroutines` flag.
+    * ❌ GCC 10 is missing a certain floating point `std::to_chars` implementation.
     * ❌ GCC 9 and earlier do not support coroutine.
 
 Tested toolchains:
 
 * [llvm-mingw](https://github.com/mstorsjo/llvm-mingw)
 * [MSYS2](https://www.msys2.org/)
-
-[^2]: Requires https://github.com/microsoft/cppwinrt/pull/1245
 
 ### Getting the Headers
 
