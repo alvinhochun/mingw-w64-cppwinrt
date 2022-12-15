@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# SPDX-FileCopyrightText: 2022 Alvin Wong
+#
+# SPDX-License-Identifier: MIT
+
 set -e
 set -x
 
@@ -53,6 +57,7 @@ done
 
 mkdir cppwinrt/winmd
 cp -r .import/winmd/src cppwinrt/winmd/src
+cp .import/winmd/LICENSE cppwinrt/winmd/
 
 pushd cppwinrt
 for file in ../patches/*; do
@@ -60,8 +65,6 @@ for file in ../patches/*; do
     patch -i "$file"
 done
 popd
-
-rm -rf cppwinrt.old/
 
 echo
 echo Done.
