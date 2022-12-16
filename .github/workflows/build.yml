@@ -1,0 +1,37 @@
+name: Build
+on:
+  push:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  gen-src-pkg:
+    name: Generate source package
+    runs-on: ubuntu-22.04
+    env:
+      CMAKE_COLOR_DIAGNOSTICS: 1
+      CLICOLOR_FORCE: 1
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          path: repo
+
+      - name: Install build tools
+        run: |
+          sudo apt-get install ninja-build
+
+      - name: Generate package tree
+        run: |
+          ./repo/packaging/generate-package.sh "mingw-w64-cppwinrt-${GITHUB_REF_NAME//\//_}"
+
+      - name: Make source tarball
+        run: |
+          tar czvf "mingw-w64-cppwinrt-${GITHUB_REF_NAME//\//_}.tar.gz" "mingw-w64-cppwinrt-${GITHUB_REF_NAME//\//_}"
+
+      - name: Upload source tarball
+        uses: actions/upload-artifact@v3
+        with:
+          name: src
+          path: mingw-w64-cppwinrt-*.tar.gz
+
