@@ -9,7 +9,7 @@ cmake_minimum_required(VERSION 3.16)
 # to include commits which haven't made it into an official release yet.
 project(mingw-w64-cppwinrt
     VERSION 2.0.221215.0
-    LANGUAGES NONE
+    LANGUAGES CXX
 )
 
 include(GNUInstallDirs)
@@ -31,9 +31,11 @@ unset(CPPWINRT_BUILD_VERSION CACHE)
 # use a native build of cppwinrt to generate the headers from the winmd file.
 
 if(IS_DIRECTORY "${PROJECT_SOURCE_DIR}/prebuilt-headers")
+    message(STATUS "Installing bundled prebuilt headers")
     add_custom_target(build-cppwinrt-headers)
     set(CPPWINRT_HEADERS_DIR "${PROJECT_SOURCE_DIR}/prebuilt-headers")
 else()
+    message(STATUS "Bundled prebuilt headers not found, generating fresh headers from metadata with cppwinrt")
     if(CMAKE_CROSSCOMPILING)
         include(ExternalProject)
         ExternalProject_Add(native-cppwinrt
@@ -143,7 +145,14 @@ install(
         ${PROJECT_SOURCE_DIR}/metadata/license-mit
     DESTINATION ${LICENSE_INSTALL_DIR}/metadata
 )
-install(
-    FILES ${PROJECT_SOURCE_DIR}/../LICENSE
-    DESTINATION ${LICENSE_INSTALL_DIR}/
-)
+if(CMAKE_PROJECT_NAME STREQUAL "mingw-w64-cppwinrt_toplevel-placeholder")
+    install(
+        FILES ${PROJECT_SOURCE_DIR}/../LICENSE
+        DESTINATION ${LICENSE_INSTALL_DIR}/
+    )
+else()
+    install(
+        FILES ${PROJECT_SOURCE_DIR}/LICENSE
+        DESTINATION ${LICENSE_INSTALL_DIR}/
+    )
+endif()
