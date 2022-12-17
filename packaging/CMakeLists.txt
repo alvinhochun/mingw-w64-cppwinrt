@@ -9,6 +9,7 @@ cmake_minimum_required(VERSION 3.16)
 # to include commits which haven't made it into an official release yet.
 project(mingw-w64-cppwinrt
     VERSION 2.0.221215.0
+    HOMEPAGE_URL https://github.com/alvinhochun/mingw-w64-cppwinrt
     LANGUAGES CXX
 )
 

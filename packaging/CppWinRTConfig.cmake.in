@@ -2,6 +2,11 @@
 #
 # SPDX-License-Identifier: MIT
 
+#[=======================================================================[
+C++/WinRT on MinGW-w64
+https://github.com/alvinhochun/mingw-w64-cppwinrt
+#]=======================================================================]
+
 @PACKAGE_INIT@
 
 set(CppWinRT_VERSION @PROJECT_VERSION@)
