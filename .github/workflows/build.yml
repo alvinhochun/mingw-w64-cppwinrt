@@ -35,3 +35,48 @@ jobs:
           name: src
           path: mingw-w64-cppwinrt-*.tar.gz
 
+  build-win:
+    name: Build Windows binary package
+    needs: gen-src-pkg
+    runs-on: ubuntu-22.04
+    env:
+      CMAKE_COLOR_DIAGNOSTICS: 1
+      CLICOLOR_FORCE: 1
+    steps:
+      - name: Fetch source tarball
+        uses: actions/download-artifact@v3
+        with:
+          name: src
+
+      - name: Install build tools
+        run: |
+          arch=i686
+          sudo apt-get install ninja-build g++-mingw-w64-${arch/_/-}
+          sudo update-alternatives --set "$arch-w64-mingw32-gcc" "/usr/bin/$arch-w64-mingw32-gcc-posix"
+          sudo update-alternatives --set "$arch-w64-mingw32-g++" "/usr/bin/$arch-w64-mingw32-g++-posix"
+
+      - name: Build
+        run: |
+          pkgname="mingw-w64-cppwinrt-${GITHUB_REF_NAME//\//_}"
+          echo "::group::tar xzvf \"$pkgname.tar.gz\""
+          tar xzvf "$pkgname.tar.gz"
+          echo "::endgroup::"
+          cmake -S "$pkgname" -B "build/" --toolchain "$PWD/$pkgname/cppwinrt/cross-mingw-toolchain.cmake" \
+            -DCMAKE_SYSTEM_PROCESSOR=i686 \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_CXX_FLAGS="-static" \
+            -DCMAKE_INSTALL_PREFIX="$PWD/$pkgname-win32/" \
+            -GNinja
+          cmake --build "build/"
+          cmake --install "build/"
+
+      - name: Package
+        run: |
+          pkgname="mingw-w64-cppwinrt-${GITHUB_REF_NAME//\//_}"
+          zip -r9 "./$pkgname-win32.zip" "$pkgname-win32/"
+
+      - name: Upload Windows package
+        uses: actions/upload-artifact@v3
+        with:
+          name: pkg-win32
+          path: mingw-w64-cppwinrt-*-win32.zip
