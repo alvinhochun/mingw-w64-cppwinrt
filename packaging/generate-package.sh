@@ -39,7 +39,7 @@ for dir in cppwinrt metadata; do
     cp -r "$dir" "$outdir/$dir"
 done
 
-for file in CMakeLists.txt *.cmake.in; do
+for file in CMakeLists.txt CppWinRT.pc.in *.cmake.in; do
     cp "$file" "$outdir/"
 done
 cp ../LICENSE "$outdir/"

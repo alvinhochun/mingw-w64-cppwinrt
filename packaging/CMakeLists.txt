@@ -77,6 +77,7 @@ set(BIN_INSTALL_DIR "${CMAKE_INSTALL_BINDIR}")
 set(INCLUDE_INSTALL_DIR "${CMAKE_INSTALL_INCLUDEDIR}/cppwinrt")
 set(WINMD_INSTALL_DIR "${CMAKE_INSTALL_DATAROOTDIR}/cppwinrt/metadata")
 set(CMAKECONFIG_INSTALL_DIR "${CMAKE_INSTALL_DATAROOTDIR}/cppwinrt/cmake")
+set(PKGCONFIG_INSTALL_DIR "${CMAKE_INSTALL_DATAROOTDIR}/pkgconfig")
 set(LICENSE_INSTALL_DIR "${CMAKE_INSTALL_DATAROOTDIR}/licenses/cppwinrt")
 
 add_library(CppWinRT_Lib INTERFACE)
@@ -129,6 +130,12 @@ install(
         ${PROJECT_BINARY_DIR}/CppWinRTConfig.cmake
         ${PROJECT_BINARY_DIR}/CppWinRTConfigVersion.cmake
     DESTINATION ${CMAKECONFIG_INSTALL_DIR}
+)
+
+configure_file(CppWinRT.pc.in ${PROJECT_BINARY_DIR}/CppWinRT.pc @ONLY)
+install(
+    FILES ${PROJECT_BINARY_DIR}/CppWinRT.pc
+    DESTINATION ${PKGCONFIG_INSTALL_DIR}
 )
 
 # License files:
