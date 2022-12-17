@@ -80,3 +80,66 @@ jobs:
         with:
           name: pkg-win32
           path: mingw-w64-cppwinrt-*-win32.zip
+
+  build-linux:
+    name: Build Linux x86_64 binary package
+    needs: gen-src-pkg
+    runs-on: ubuntu-latest
+    container:
+      image: ubuntu:18.04
+    defaults:
+      run:
+        shell: bash
+    env:
+      CMAKE_COLOR_DIAGNOSTICS: 1
+      CLICOLOR_FORCE: 1
+    steps:
+      - name: Fetch source tarball
+        uses: actions/download-artifact@v3
+        with:
+          name: src
+
+      - name: Install build tools
+        run: |
+          apt-get update
+          apt-get -y install ninja-build gpg wget
+          echo 'deb https://ppa.launchpadcontent.net/ubuntu-toolchain-r/test/ubuntu bionic main' >> /etc/apt/sources.list
+          echo 'deb-src https://ppa.launchpadcontent.net/ubuntu-toolchain-r/test/ubuntu bionic main' >> /etc/apt/sources.list
+          apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 60C317803A41BA51845E371A1E9377A2BA9EF27F
+          apt-get update
+          apt-get -y install gcc-11 g++-11
+          update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 10
+          # update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 20
+          update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-11 10
+          # update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 20
+          wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor - | tee /usr/share/keyrings/kitware-archive-keyring.gpg >/dev/null
+          echo 'deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg] https://apt.kitware.com/ubuntu/ bionic main' | tee /etc/apt/sources.list.d/kitware.list >/dev/null
+          apt-get update
+          rm /usr/share/keyrings/kitware-archive-keyring.gpg
+          apt-get -y install kitware-archive-keyring
+          apt-get -y install cmake
+
+      - name: Build
+        run: |
+          pkgname="mingw-w64-cppwinrt-${GITHUB_REF_NAME//\//_}"
+          echo "::group::tar xzvf \"$pkgname.tar.gz\""
+          tar xzvf "$pkgname.tar.gz"
+          echo "::endgroup::"
+          cmake -S "$pkgname" -B "build/" \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_CXX_FLAGS="-static -pthread" \
+            -DCMAKE_INSTALL_PREFIX="$PWD/$pkgname-linux-x86_64/" \
+            -GNinja
+          cmake --build "build/"
+          cmake --install "build/"
+
+      - name: Package
+        run: |
+          pkgname="mingw-w64-cppwinrt-${GITHUB_REF_NAME//\//_}"
+          tar czvf "./$pkgname-linux-x86_64.tar.gz" "$pkgname-linux-x86_64/"
+
+      - name: Upload Linux package
+        uses: actions/upload-artifact@v3
+        with:
+          name: pkg-linux-x86_64
+          path: mingw-w64-cppwinrt-*-linux-x86_64.tar.gz
