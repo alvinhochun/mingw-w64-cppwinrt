@@ -7,4 +7,4 @@ Name: CppWinRT
 Description: C++/WinRT language projection
 Version: @PROJECT_VERSION@
 URL: https://github.com/alvinhochun/mingw-w64-cppwinrt
-Cflags: -I${includedir}/cppwinrt
+Cflags: -I${includedir}/cppwinrt-@PROJECT_VERSION@
