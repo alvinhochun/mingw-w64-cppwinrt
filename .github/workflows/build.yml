@@ -143,3 +143,46 @@ jobs:
         with:
           name: pkg-linux-x86_64
           path: mingw-w64-cppwinrt-*-linux-x86_64.tar.gz
+
+  test-autotools-build-linux:
+    name: Test autotools build on Linux
+    needs: build-linux
+    runs-on: ubuntu-latest
+    container:
+      image: archlinux:base-devel
+    defaults:
+      run:
+        shell: bash
+    env:
+      CMAKE_COLOR_DIAGNOSTICS: 1
+      CLICOLOR_FORCE: 1
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          path: repo
+
+      - name: Fetch Linux binary package
+        uses: actions/download-artifact@v3
+        with:
+          name: pkg-linux-x86_64
+
+      - name: Install build tools
+        run: |
+          pacman --noconfirm -Suuy
+          pacman --needed --noconfirm -S autoconf autoconf-archive make mingw-w64-gcc 
+
+      - name: Cross build 'hello-json' example
+        run: |
+          echo "::group::tar xzvf mingw-w64-cppwinrt-*-linux-x86_64.tar.gz ..."
+          tar xzvf mingw-w64-cppwinrt-*-linux-x86_64.tar.gz --strip-components=1 -C /usr/x86_64-w64-mingw32
+          echo "::endgroup::"
+          cd repo/examples/hello-json
+          autoreconf --install
+          echo '#!/bin/sh' > /usr/bin/x86_64-w64-mingw32-pkg-config
+          echo 'export PKG_CONFIG_LIBDIR=/usr/x86_64-w64-mingw32/lib/pkgconfig:/usr/x86_64-w64-mingw32/share/pkgconfig' >> /usr/bin/x86_64-w64-mingw32-pkg-config
+          echo 'export PKG_CONFIG_PATH=${PKG_CONFIG_LIBDIR}' >> /usr/bin/x86_64-w64-mingw32-pkg-config
+          echo 'pkg-config --define-prefix $@' >> /usr/bin/x86_64-w64-mingw32-pkg-config
+          chmod +x /usr/bin/x86_64-w64-mingw32-pkg-config
+          ./configure --host x86_64-w64-mingw32
+          make
+          [[ -f hello-json.exe ]]
