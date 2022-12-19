@@ -10,8 +10,22 @@ project(smtc-demo LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -municode -mcx16")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -municode")
 add_compile_definitions(NOMINMAX)
+
+function(TestIsX64 OUTPUT_VARNAME)
+    set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
+    include(CheckCXXSourceCompiles)
+    check_cxx_source_compiles("
+#if !defined(__x86_64__) && !defined(_M_X64)
+#  error Not x86_64
+#endif
+    " ${OUTPUT_VARNAME})
+endfunction()
+TestIsX64(TARGET_IS_X64)
+if(TARGET_IS_X64)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mcx16")
+endif()
 
 # This is assuming you've built and installed the library with the given
 # local-build.sh, but you may also point to a custom install by setting
