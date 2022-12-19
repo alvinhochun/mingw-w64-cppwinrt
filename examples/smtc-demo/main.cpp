@@ -14,10 +14,14 @@
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#if __has_include(<systemmediatransportcontrolsinterop.h>)
+#include <systemmediatransportcontrolsinterop.h>
+#else
+#include "systemmediatransportcontrolsinterop.h"
+#endif
 
 #include <winrt/Windows.Foundation.h>
 #include <winrt/Windows.Media.h>
-#include <winrt/Windows.Media.Playback.h>
 
 using winrt::Windows::Foundation::TimeSpan;
 using winrt::Windows::Media::MediaPlaybackAutoRepeatMode;
@@ -26,7 +30,6 @@ using winrt::Windows::Media::SystemMediaTransportControls;
 using winrt::Windows::Media::SystemMediaTransportControlsButton;
 using winrt::Windows::Media::SystemMediaTransportControlsButtonPressedEventArgs;
 using winrt::Windows::Media::SystemMediaTransportControlsTimelineProperties;
-using winrt::Windows::Media::Playback::MediaPlayer;
 
 
 struct song_info {
@@ -61,7 +64,6 @@ struct seek_command {
     int m_seekPos;
 };
 
-MediaPlayer s_mediaPlayer{ nullptr };
 std::queue<std::variant<button_command, seek_command>> s_queue;
 std::mutex s_queueMutex;
 HANDLE s_queueEvent;
@@ -172,7 +174,57 @@ void tick(const SystemMediaTransportControls &smtc) {
     printf("Current position: %d\n", s_currentPlayPos);
 }
 
+LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+    switch (uMsg) {
+    case WM_DESTROY:
+        PostQuitMessage(0);
+        return 0;
+    }
+    return DefWindowProc(hwnd, uMsg, wParam, lParam);
+}
+
+HWND createMessageHwnd() {
+    HINSTANCE hInstance = GetModuleHandleW(nullptr);
+    const wchar_t CLASS_NAME[]  = L"SMTC demo hwnd class";
+    WNDCLASSW wc = {};
+    wc.lpfnWndProc   = WindowProc;
+    wc.hInstance     = hInstance;
+    wc.lpszClassName = CLASS_NAME;
+    RegisterClassW(&wc);
+    return CreateWindowExW(
+        0,                          // Optional window styles.
+        CLASS_NAME,                 // Window class
+        L"SMTC demo message hwnd",  // Window text
+        WS_POPUP,                   // Window style
+
+        // Size and position
+        0, 0, 0, 0,
+
+        nullptr,    // Parent window
+        nullptr,    // Menu
+        hInstance,  // Instance handle
+        nullptr     // Additional application data
+    );
+}
+
+SystemMediaTransportControls getSmtcForHwnd(HWND hwnd) {
+    auto smtcInterop = winrt::get_activation_factory<SystemMediaTransportControls, ISystemMediaTransportControlsInterop>();
+    SystemMediaTransportControls smtc{ nullptr };
+    HRESULT hr = smtcInterop->GetForWindow(hwnd, winrt::guid_of<SystemMediaTransportControls>(), winrt::put_abi(smtc));
+    if (FAILED(hr)) {
+        printf("Failed to get ISystemMediaTransportControls, HRESULT: %lx\n", hr);
+        winrt::throw_hresult(hr);
+    }
+    return smtc;
+}
+
 void test() {
+    HWND hwnd = createMessageHwnd();
+    if (!hwnd) {
+        printf("Failed to create window.\n");
+        return;
+    }
+
     HANDLE handleStdin = GetStdHandle(STD_INPUT_HANDLE);
     if (handleStdin == INVALID_HANDLE_VALUE) {
         printf("Not a console!\n");
@@ -183,9 +235,7 @@ void test() {
     s_mockPlayerTimer = CreateWaitableTimerW(nullptr, false, nullptr);
 
     try {
-        s_mediaPlayer = MediaPlayer();
-        auto smtc = s_mediaPlayer.SystemMediaTransportControls();
-        s_mediaPlayer.CommandManager().IsEnabled(false);
+        auto smtc = getSmtcForHwnd(hwnd);
 
         smtc.IsPlayEnabled(true);
         smtc.IsPauseEnabled(true);
@@ -212,10 +262,10 @@ void test() {
         updateTimeline(smtc);
 
         printf("We are playing media!\n");
-        
+
         HANDLE waitHandles[] { handleStdin, s_queueEvent, s_mockPlayerTimer };
         do {
-            switch (WaitForMultipleObjects(ARRAYSIZE(waitHandles), waitHandles, FALSE, INFINITE)) {
+            switch (MsgWaitForMultipleObjects(ARRAYSIZE(waitHandles), waitHandles, FALSE, INFINITE, QS_ALLEVENTS)) {
             case WAIT_OBJECT_0: {
                 INPUT_RECORD inputRecord;
                 DWORD readCount;
@@ -284,9 +334,19 @@ void test() {
             case WAIT_OBJECT_0 + 2: {
                 tick(smtc);
             } break;
+            case WAIT_OBJECT_0 + ARRAYSIZE(waitHandles): {
+                MSG msg = {};
+                while (PeekMessageW(&msg, nullptr, 0, 0, PM_REMOVE) > 0) {
+                    if (msg.message == WM_QUIT) {
+                        goto loop_exit;
+                    }
+                    TranslateMessage(&msg);
+                    DispatchMessageW(&msg);
+                }
+            } break;
             case WAIT_FAILED:
             default:
-                printf("Error in WaitForMultipleObjects.\n");
+                printf("Error in MsgWaitForMultipleObjects.\n");
                 goto loop_exit;
             }
         } while (true);
