@@ -87,6 +87,9 @@ target_include_directories(CppWinRT_Lib
         $<BUILD_INTERFACE:${CPPWINRT_HEADERS_DIR}>
         $<INSTALL_INTERFACE:${INCLUDE_INSTALL_DIR}>
 )
+target_compile_features(CppWinRT_Lib
+    INTERFACE cxx_std_20
+)
 
 install(
     TARGETS CppWinRT_Lib
