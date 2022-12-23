@@ -45,12 +45,11 @@ else()
         )
         ExternalProject_Get_Property(native-cppwinrt INSTALL_DIR)
         set(NATIVE_CPPWINRT_TOOL "${INSTALL_DIR}/bin/cppwinrt")
+        set(NATIVE_CPPWINRT_TOOL_DEPS native-cppwinrt)
         unset(INSTALL_DIR)
     else()
         set(NATIVE_CPPWINRT_TOOL cppwinrt)
-        add_custom_target(native-cppwinrt
-            DEPENDS cppwinrt
-        )
+        set(NATIVE_CPPWINRT_TOOL_DEPS cppwinrt)
     endif()
     add_custom_command(
         OUTPUT
@@ -61,7 +60,7 @@ else()
             -input "${PROJECT_SOURCE_DIR}/metadata/Windows.winmd"
             -output "${PROJECT_BINARY_DIR}/headers.gen"
             -verbose
-        DEPENDS native-cppwinrt
+        DEPENDS ${NATIVE_CPPWINRT_TOOL_DEPS}
         VERBATIM
     )
     add_custom_target(build-cppwinrt-headers ALL
