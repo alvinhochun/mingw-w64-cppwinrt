@@ -37,6 +37,7 @@ jobs:
 
   build-headers-only:
     name: Generate headers-only package
+    needs: gen-src-pkg
     runs-on: ubuntu-22.04
     env:
       CMAKE_COLOR_DIAGNOSTICS: 1
