@@ -16,13 +16,24 @@ project(mingw-w64-cppwinrt
 include(GNUInstallDirs)
 
 
+include(FeatureSummary)
+option(INSTALL_CPPWINRT_TOOL "Install the cppwinrt binary tool to the output" ON)
+add_feature_info(INSTALL_CPPWINRT_TOOL INSTALL_CPPWINRT_TOOL "Install the cppwinrt binary tool")
+option(INSTALL_WINDOWS_WINMD "Install the Windows.winmd metadata file to the output" ON)
+add_feature_info(INSTALL_WINDOWS_WINMD INSTALL_WINDOWS_WINMD "Install the Windows.winmd metadata file")
+
+
 # === Include cppwinrt executable target ===
 
 set(BUILD_TESTING FALSE)
 set(CPPWINRT_BUILD_VERSION "${PROJECT_VERSION}")
 set(CPPWINRT_BUILD_VERSION "${PROJECT_VERSION}" CACHE STRING "The version string used for cppwinrt." FORCE)
 
-add_subdirectory(cppwinrt)
+if(INSTALL_CPPWINRT_TOOL)
+    add_subdirectory(cppwinrt)
+else()
+    add_subdirectory(cppwinrt EXCLUDE_FROM_ALL)
+endif()
 
 unset(CPPWINRT_BUILD_VERSION CACHE)
 
@@ -107,10 +118,12 @@ install(
     MESSAGE_NEVER
 )
 
-install(
-    FILES "${PROJECT_SOURCE_DIR}/metadata/Windows.winmd"
-    DESTINATION ${WINMD_INSTALL_DIR}
-)
+if(INSTALL_WINDOWS_WINMD)
+    install(
+        FILES "${PROJECT_SOURCE_DIR}/metadata/Windows.winmd"
+        DESTINATION ${WINMD_INSTALL_DIR}
+    )
+endif()
 
 include(CMakePackageConfigHelpers)
 configure_package_config_file(CppWinRTConfig.cmake.in
@@ -166,3 +179,5 @@ else()
         DESTINATION ${LICENSE_INSTALL_DIR}/
     )
 endif()
+
+feature_summary(WHAT ALL)

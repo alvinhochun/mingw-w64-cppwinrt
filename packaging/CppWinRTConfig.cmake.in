@@ -10,8 +10,12 @@ https://github.com/alvinhochun/mingw-w64-cppwinrt
 @PACKAGE_INIT@
 
 set(CppWinRT_VERSION @PROJECT_VERSION@)
-set_and_check(CppWinRT_TOOL_PATH "@PACKAGE_BIN_INSTALL_DIR@/cppwinrt@CMAKE_EXECUTABLE_SUFFIX@")
-set_and_check(CppWinRT_METADATA_PATH "@PACKAGE_WINMD_INSTALL_DIR@/Windows.winmd")
+if(@INSTALL_CPPWINRT_BIN@)
+    set_and_check(CppWinRT_TOOL_PATH "@PACKAGE_BIN_INSTALL_DIR@/cppwinrt@CMAKE_EXECUTABLE_SUFFIX@")
+endif()
+if(@INSTALL_WINDOWS_WINMD@)
+    set_and_check(CppWinRT_METADATA_PATH "@PACKAGE_WINMD_INSTALL_DIR@/Windows.winmd")
+endif()
 set_and_check(CppWinRT_INCLUDE_DIR "@PACKAGE_INCLUDE_INSTALL_DIR@")
 include("${CMAKE_CURRENT_LIST_DIR}/CppWinRTTargets.cmake")
 
