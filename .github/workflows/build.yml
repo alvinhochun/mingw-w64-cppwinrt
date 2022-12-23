@@ -35,6 +35,47 @@ jobs:
           name: src
           path: mingw-w64-cppwinrt-*.tar.gz
 
+  build-headers-only:
+    name: Generate headers-only package
+    runs-on: ubuntu-22.04
+    env:
+      CMAKE_COLOR_DIAGNOSTICS: 1
+      CLICOLOR_FORCE: 1
+    steps:
+      - name: Fetch source tarball
+        uses: actions/download-artifact@v3
+        with:
+          name: src
+
+      - name: Install build tools
+        run: |
+          sudo apt-get install ninja-build
+
+      - name: Build
+        run: |
+          pkgname="mingw-w64-cppwinrt-${GITHUB_REF_NAME//\//_}"
+          echo "::group::tar xzvf \"$pkgname.tar.gz\""
+          tar xzvf "$pkgname.tar.gz"
+          echo "::endgroup::"
+          cmake -S "$pkgname" -B "build/" \
+            -DINSTALL_CPPWINRT_TOOL=OFF \
+            -DINSTALL_WINDOWS_WINMD=OFF \
+            -DCMAKE_INSTALL_PREFIX="$PWD/$pkgname-headers/" \
+            -GNinja
+          cmake --build "build/"
+          cmake --install "build/"
+
+      - name: Package
+        run: |
+          pkgname="mingw-w64-cppwinrt-${GITHUB_REF_NAME//\//_}"
+          tar czvf "./$pkgname-headers.tar.gz" "$pkgname-headers/"
+
+      - name: Upload headers-only package
+        uses: actions/upload-artifact@v3
+        with:
+          name: pkg-headers
+          path: mingw-w64-cppwinrt-*-headers.tar.gz
+
   build-win:
     name: Build Windows binary package
     needs: gen-src-pkg
