@@ -36,7 +36,7 @@ Compilers:
 * LLVM/Clang:
     * ✅ LLVM 15 is recommended.
     * 🔲 LLVM 14 is untested.
-    * ⚠️ LLVM 13 does not work out of the box due to missing a floating point `std::to_chars` implementation in libc++, but can be worked around by disabling the `winrt::to_hstring(float)` and `winrt::to_hstring(double)` overloads.
+    * ⚠️ LLVM 13 does not work out of the box due to missing a floating point `std::to_chars` implementation in libc++, but can be worked around by disabling the `winrt::to_hstring(float)` and `winrt::to_hstring(double)` overloads (https://github.com/microsoft/cppwinrt/pull/1257). It also contains only experimental coroutine support (the stabilized implementation is only available since libc++ 14) so anything involving coroutines should be considered unstable and to be avoided.
     * ⚠️ Earlier versions are untested.
 * GCC:
     * ✅ GCC 12 in MSYS2 has been tested to work.
