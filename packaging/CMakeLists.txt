@@ -100,6 +100,7 @@ target_include_directories(CppWinRT_Lib
 target_compile_features(CppWinRT_Lib
     INTERFACE cxx_std_20
 )
+set_property(TARGET CppWinRT_Lib PROPERTY EXPORT_NAME CppWinRT)
 
 install(
     TARGETS CppWinRT_Lib
