@@ -1,15 +1,20 @@
 C++/WinRT on MinGW-w64
 ======================
 
-[C++/WinRT][cppwinrt] is a C++ binding (officially "language projection") for the WinRT[^1] APIs. Originally developed by Kenny Kerr, it has become a part of the official Windows SDK and the recommended way to consume WinRT APIs from C++.
+[C++/WinRT][cppwinrt] is a C++ binding (officially "language projection") for the WinRT[^1] APIs. Originally developed by Kenny Kerr, it has become a part of the official Windows SDK and the recommended way to consume WinRT APIs from C++. See also the [official introduction to C++/WinRT][intro] and the [WinRT API reference][apiref].
 
 C++/WinRT was made with MSVC in mind, but a series of changes to make it compatible with GCC and Clang (also libstdc++ and libc++ respectively) has been merged upstream, making it usable with various MinGW-w64 toolchains (with some limitations). This is a collection of documentation and example code intended to help you understand how to use this binding with a MinGW-w64 toolchain.
+
+> **Note:** If you are using MSVC and Visual Studio, please use the [official NuGet package][nuget] instead.
 
 > ⚠️ **Warning: The information here is work in progress and experimental.**
 
 [^1]: Windows Runtime, not to be confused with the operating system that was called "Windows RT".
 
 [cppwinrt]: https://github.com/microsoft/cppwinrt
+[intro]: https://learn.microsoft.com/en-us/windows/uwp/cpp-and-winrt-apis/
+[apiref]: https://learn.microsoft.com/en-us/uwp/api/
+[nuget]: https://www.nuget.org/packages/Microsoft.Windows.CppWinRT/
 
 
 Status
@@ -49,47 +54,27 @@ Tested toolchains:
 * [llvm-mingw](https://github.com/mstorsjo/llvm-mingw)
 * [MSYS2](https://www.msys2.org/)
 
-### Getting the Headers
+### Using cppwinrt with Prebuilt Headers
 
-We are still figuring out how the headers and the host tool should be distributed by toolchains. If you want to try this out now, you may build cppwinrt and generate the headers yourself.
+Headers are built on [GitHub Actions][GHA] workflow runs and made available as build artifacts.
 
-1. Get the latest cppwinrt source code from https://github.com/microsoft/cppwinrt:
-    ```console
-    > git clone https://github.com/microsoft/cppwinrt.git
-    ```
-2. Compile cppwinrt:
-    > Note: When building cppwinrt for production use, you should always specify a version string with the `CPPWINRT_BUILD_VERSION` CMake variable. Normally this should follow the version number of the official release tag. In case you are building from a commit not yet released, I suggest following the format `2.0.YYMMDD.0` using today's date.
-    ```console
-    > cmake -S cppwinrt -B cppwinrt-build -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF -DCPPWINRT_BUILD_VERSION="2.0.221213.0"
-    > cmake --build cppwinrt-build
-    ```
-    The tool should now be available at `cppwinrt-build/cppwinrt` or `cppwinrt-build/cppwinrt.exe`.
-3. Get the WinMD (Windows Metadata) files:
-    * If you are on Windows, the system already comes with the WinMD files for the version of Windows you are using. You only need to get the files manually if you want to use APIs introduced in newer versions of Windows.
-    * They also come with the Windows SDK.
-    * A copy of `Windows.winmd` can be download from the [`windows-rs`][windows-rs] repository (under `crates/libs/metadata/default/Windows.winmd`).
-4. Generate the headers:
-    * To use the WinMD files included in Windows:
-        ```console
-        > cppwinrt  -in local -out cppwinrt-headers
-        ```
-    * To use a specific WinMD file:
-        ```console
-        > cppwinrt -in path/to/Windows.winmd -out cppwinrt-headers
-        ```
-    The headers should now be available at `cppwinrt-header/`.
+[GHA]: https://github.com/alvinhochun/mingw-w64-cppwinrt/actions
 
-[windows-rs]: https://github.com/microsoft/windows-rs
+### Build System Integration
 
-### Using in Build
+This project provides both CMake config file and pkg-config file in the releases for using the headers with build systems such as CMake and Autotools. To see how these integrations work, you can check the [examples](examples/). Better documentation may be added in the future.
 
-At this time we are still figuring out the best way to support using C++/WinRT with different build systems. To use C++/WinRT now you will need to set the build up manually.
+(I am still figuring this out, so details are subject to change.)
 
-C++/WinRT is a header-only library, which means all you need to do is to add the path of `cppwinrt-header/` to the include paths. How this is done depends on the build system. For example with CMake, you can add `include_directories("path/to/cppwinrt-header")` before creating the targets.
+<!--
+### Package Managers
 
-The C++/WinRT headers are named using the WinRT API namespaces with exact capitalization (PascalCase). To support cross-compiling from Linux, any C++/WinRT includes shall use the exact matching case.
+* A cppwinrt package is available in MSYS2: https://packages.msys2.org/base/mingw-w64-cppwinrt
+-->
 
-Some functions may require 16-byte compare-and-exchange on x86_64. If you get `undefined reference to '__sync_bool_compare_and_swap_16'` when linking, then you need to add `-mcx16` to the compile flags.
+### Building Upstream cppwinrt Directly
+
+If you want to use the upstream cppwinrt tool directly and without build system integration, please refer to [Using Upstream cppwinrt](docs/using-upstream-cppwinrt.md).
 
 
 <!--
