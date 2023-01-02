@@ -44,7 +44,7 @@ endif()
 add_executable(smtc-demo main.cpp)
 
 # After `find_package(CppWinRT)`, this is all you need to use CppWinRT:
-target_link_libraries(smtc-demo PRIVATE CppWinRT::CppWinRT_Lib)
+target_link_libraries(smtc-demo PRIVATE CppWinRT::CppWinRT)
 
 # This showcases some of the variables provided by `find_package(CppWinRT)`:
 include(CMakePrintHelpers)
