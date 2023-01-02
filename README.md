@@ -29,17 +29,19 @@ Usage Guide
 
 ### Toolchain
 
-C++/WinRT requires C++20 due to its coroutine support. You will need a rather recent compiler. You should also try to get the latest MinGW-w64 runtime and headers.
+C++/WinRT requires C++20 for its coroutine support. (C++/WinRT officially supports C++17 but only with MSVC-specific coroutine extensions.) You will need a rather recent compiler. You should also try to get the latest MinGW-w64 runtime and headers.
 
 Compilers:
 
 * LLVM/Clang:
     * ✅ LLVM 15 is recommended.
-    * 🔲 Earlier versions are untested.
+    * 🔲 LLVM 14 is untested.
+    * ⚠️ LLVM 13 does not work out of the box due to missing a floating point `std::to_chars` implementation in libc++, but can be worked around by disabling the `winrt::to_hstring(float)` and `winrt::to_hstring(double)` overloads.
+    * ⚠️ Earlier versions are untested.
 * GCC:
     * ✅ GCC 12 in MSYS2 has been tested to work.
     * 🔲 GCC 11 is untested.
-    * ❌ GCC 10 is missing a certain floating point `std::to_chars` implementation.
+    * ⚠️ GCC 10 is missing a floating point `std::to_chars` implementation in libc++ (same as LLVM 13).
     * ❌ GCC 9 and earlier do not support coroutine.
 
 Tested toolchains:
