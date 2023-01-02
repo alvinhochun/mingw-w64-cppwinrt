@@ -61,10 +61,10 @@ jobs:
           cmake -S "$pkgname" -B "build/" \
             -DINSTALL_CPPWINRT_TOOL=OFF \
             -DINSTALL_WINDOWS_WINMD=OFF \
-            -DCMAKE_INSTALL_PREFIX="$PWD/$pkgname-headers/" \
+            -DCMAKE_INSTALL_PREFIX="/opt/$pkgname-headers" \
             -GNinja
           cmake --build "build/"
-          cmake --install "build/"
+          cmake --install "build/" --prefix "$PWD/$pkgname-headers/"
 
       - name: Package
         run: |
@@ -107,10 +107,10 @@ jobs:
             -DCMAKE_SYSTEM_PROCESSOR=i686 \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_CXX_FLAGS="-static" \
-            -DCMAKE_INSTALL_PREFIX="$PWD/$pkgname-win32/" \
+            -DCMAKE_INSTALL_PREFIX="/$pkgname-win32" \
             -GNinja
           cmake --build "build/"
-          cmake --install "build/"
+          cmake --install "build/" --prefix "$PWD/$pkgname-win32/"
 
       - name: Package
         run: |
@@ -170,10 +170,10 @@ jobs:
           cmake -S "$pkgname" -B "build/" \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_CXX_FLAGS="-static -pthread" \
-            -DCMAKE_INSTALL_PREFIX="$PWD/$pkgname-linux-x86_64/" \
+            -DCMAKE_INSTALL_PREFIX="/opt/$pkgname-linux-x86_64" \
             -GNinja
           cmake --build "build/"
-          cmake --install "build/"
+          cmake --install "build/" --prefix "$PWD/$pkgname-linux-x86_64/"
 
       - name: Package
         run: |
