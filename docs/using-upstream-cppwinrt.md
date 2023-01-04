@@ -1,3 +1,8 @@
+<!--
+SPDX-FileCopyrightText: 2022-2023 Alvin Wong
+SPDX-License-Identifier: MIT
+-->
+
 Using Upstream cppwinrt
 =======================
 

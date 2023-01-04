@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2022 Alvin Wong
+#
+# SPDX-License-Identifier: MIT
+
 prefix=@CMAKE_INSTALL_PREFIX@
 includedir=${prefix}/include
 
