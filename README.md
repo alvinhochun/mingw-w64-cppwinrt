@@ -10,6 +10,8 @@ C++/WinRT on MinGW-w64
 
 C++/WinRT was made with MSVC in mind, but a series of changes to make it compatible with GCC and Clang (also libstdc++ and libc++ respectively) has been merged upstream, making it usable with various MinGW-w64 toolchains (with some limitations). This is a collection of documentation and example code intended to help you understand how to use this binding with a MinGW-w64 toolchain.
 
+If you want to see how C++/WinRT works within Visual Studio, I attempted to document it [in a separate file](docs/how-its-done-in-visual-studio.md).
+
 > **Note:** If you are using MSVC and Visual Studio, please use the [official NuGet package][nuget] instead.
 
 > ⚠️ **Warning: The information here is work in progress and experimental.**
