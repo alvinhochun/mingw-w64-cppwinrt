@@ -7,7 +7,7 @@
 set -e
 set -x
 
-CPPWINRT_COMMIT=0a6cb062e2151cf6c8f357aa8ef735e359f8a98c
+CPPWINRT_COMMIT=fe304096fa30583f3cc2ebfdbf564d2b4081e2ad
 WINMD_COMMIT=0f1eae3bfa63fa2ba3c2912cbfe72a01db94cc5a
 
 cd -- "$(dirname -- "${BASH_SOURCE[0]}")"
@@ -58,13 +58,6 @@ done
 mkdir cppwinrt/winmd
 cp -r .import/winmd/src cppwinrt/winmd/src
 cp .import/winmd/LICENSE cppwinrt/winmd/
-
-pushd cppwinrt
-for file in ../patches/*; do
-    patch --dry-run -f -i "$file"
-    patch -i "$file"
-done
-popd
 
 echo
 echo Done.

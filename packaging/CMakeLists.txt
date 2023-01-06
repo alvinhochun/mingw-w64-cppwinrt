@@ -8,7 +8,7 @@ cmake_minimum_required(VERSION 3.16)
 # The project version should follow upstream cppwinrt, except when we have
 # to include commits which haven't made it into an official release yet.
 project(mingw-w64-cppwinrt
-    VERSION 2.0.221221.0
+    VERSION 2.0.230103.0
     HOMEPAGE_URL https://github.com/alvinhochun/mingw-w64-cppwinrt
     LANGUAGES CXX
 )
@@ -28,6 +28,8 @@ add_feature_info(INSTALL_WINDOWS_WINMD INSTALL_WINDOWS_WINMD "Install the Window
 set(BUILD_TESTING FALSE)
 set(CPPWINRT_BUILD_VERSION "${PROJECT_VERSION}")
 set(CPPWINRT_BUILD_VERSION "${PROJECT_VERSION}" CACHE STRING "The version string used for cppwinrt." FORCE)
+set(EXTERNAL_WINMD_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/cppwinrt/winmd/src")
+set(EXTERNAL_WINMD_INCLUDE_DIR "${EXTERNAL_WINMD_INCLUDE_DIR}" CACHE PATH "" FORCE)
 
 if(INSTALL_CPPWINRT_TOOL)
     add_subdirectory(cppwinrt)
@@ -36,6 +38,7 @@ else()
 endif()
 
 unset(CPPWINRT_BUILD_VERSION CACHE)
+unset(EXTERNAL_WINMD_INCLUDE_DIR CACHE)
 
 
 # === Include headers ===
