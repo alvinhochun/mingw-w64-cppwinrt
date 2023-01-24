@@ -31,6 +31,7 @@ Get the WinMD (Windows Metadata) files
 * If you are on Windows, the system already comes with the WinMD files for the version of Windows you are using. You only need to get the files manually if you want to use APIs introduced in newer versions of Windows.
 * They also come with the Windows SDK.
 * A copy of `Windows.winmd` can be download from the [`windows-rs`][windows-rs] repository (under `crates/libs/metadata/default/Windows.winmd`).
+* This file is also mirrored on this repo in [../packaging/metadata].
 
 [windows-rs]: https://github.com/microsoft/windows-rs
 
