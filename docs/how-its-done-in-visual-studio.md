@@ -1,3 +1,8 @@
+<!--
+SPDX-FileCopyrightText: 2023 Alvin Wong
+SPDX-License-Identifier: MIT
+-->
+
 C++/WinRT Integration in Visual Studio
 ======================================
 
