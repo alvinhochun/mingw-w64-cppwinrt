@@ -20,9 +20,19 @@ The Windows SDK has shipped C++/WinRT headers for system APIs and the cppwinrt t
 
 In the SDK, a copy of the generated headers is provided inside `<WindowsSdkDir>\Include\<WindowsTargetPlatformVersion>\cppwinrt`. The cppwinrt tool is inside the corresponding bin dir, i.e. `<WindowsSdkDir>\bin\<WindowsTargetPlatformVersion>\<arch>\cppwinrt.exe`.
 
+### MSBuild
+
 To make this work using Visual Studio / MSBuild, the header include dir is specified in `<WindowsSdkDir>\DesignTime\CommonConfiguration\Neutral\UAP\<WindowsTargetPlatformVersion>\UAP.props` as the MSBuild property `CppWinRT_IncludePath`, but this is only set if the property has not been set already (which allows the C++/WinRT NuGet package to override it). This property is included as part of the `WindowsSDK_IncludePath` property, also specified in the same file.
 
-On the other hand, the Visual Studio command prompt hard codes the include paths to be set to the `INCLUDE` environment variable to match the `UAP.props` defaults, so `<WindowsSdkDir>\Include\<WindowsTargetPlatformVersion>\cppwinrt` is always in the include path along with the rest of the include dirs.
+### VS Native Tools Command Prompt
+
+Unlike MSBuild, the Visual Studio command prompt hardcodes the include paths to be set to the `INCLUDE` and `EXTERNAL_INCLUDE` environment variables to match the `UAP.props` defaults, so `<WindowsSdkDir>\Include\<WindowsTargetPlatformVersion>\cppwinrt` is always in the include path along with the rest of the include dirs.
+
+This is done in `Common7\Tools\vsdevcmd\core\winsdk.bat`[^1] by adding the include paths to `__VSCMD_WINSDK_INCLUDE`. This script is called from `Common7\Tools\vsdevcmd.bat`[^1], which then combines the include paths from multiple sources including the winsdk one to form the `INCLUDE` and `EXTERNAL_INCLUDE` environment variables. There is no way to override this behaviour.
+
+In order to use a custom set of C++/WinRT headers one must add the include path to the `cl.exe` command line or prepend the corresponding include path to these environment variables after calling `vcvarsall.bat`. Optionally one may also want to remove the SDK cppwinrt include path from the environment variables to avoid confusion (a script can try to look for `%WindowsSdkDir%\include\%WindowsSDKVersion%\cppwinrt` but this may not be reliable).
+
+[^1]: Paths are relative to VS install path, e.g. `C:\Program Files\Microsoft Visual Studio\2022\Community`
 
 
 Visual Studio: NuGet
