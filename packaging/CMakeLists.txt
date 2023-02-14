@@ -8,7 +8,7 @@ cmake_minimum_required(VERSION 3.16)
 # The project version should follow upstream cppwinrt, except when we have
 # to include commits which haven't made it into an official release yet.
 project(mingw-w64-cppwinrt
-    VERSION 2.0.230103.0
+    VERSION 2.0.230207.1
     HOMEPAGE_URL https://github.com/alvinhochun/mingw-w64-cppwinrt
     LANGUAGES CXX
 )

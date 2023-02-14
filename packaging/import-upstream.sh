@@ -7,7 +7,7 @@
 set -e
 set -x
 
-CPPWINRT_COMMIT=fe304096fa30583f3cc2ebfdbf564d2b4081e2ad
+CPPWINRT_COMMIT=3bbee2cf2c8da944a29f493c42f06ce57086f28f
 WINMD_COMMIT=0f1eae3bfa63fa2ba3c2912cbfe72a01db94cc5a
 
 cd -- "$(dirname -- "${BASH_SOURCE[0]}")"
